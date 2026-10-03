@@ -4,8 +4,8 @@
 // Website ini menggunakan objek global window.S yang menyimpan
 // seluruh game state secara real-time. Kita baca langsung dari sana!
 
-const ANALYZE_URL = 'https://duel-masters-ai-bot.onrender.com/api/analyze';
-const CARDS_URL   = 'https://duel-masters-ai-bot.onrender.com/api/cards';
+const ANALYZE_URL = 'https://revarend.pythonanywhere.com/api/analyze';
+const CARDS_URL   = 'https://revarend.pythonanywhere.com/api/cards';
 
 let syncInterval  = null;
 let localCardsDB  = [];  // fallback DB dari server kita
