@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let isSyncOn = false;
 
   function checkServerHealth() {
-    fetch('https://duel-masters-ai-bot.onrender.com/api/cards', { method: 'GET' })
+    fetch('https://revarend.pythonanywhere.com/api/cards', { method: 'GET' })
       .then(res => res.json())
       .then(data => {
         if (isSyncOn) {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardDatalist  = document.getElementById('cardSuggestions');
 
   // Populate autocomplete from card DB
-  fetch('https://duel-masters-ai-bot.onrender.com/api/cards').then(r => r.json()).then(d => {
+  fetch('https://revarend.pythonanywhere.com/api/cards').then(r => r.json()).then(d => {
     const list = Array.isArray(d) ? d : (d.data || []);
     list.forEach(c => {
       const opt = document.createElement('option');
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnBuildDeck.textContent = '⏳ Merancang Deck Cerdas...';
       btnBuildDeck.disabled = true;
 
-      fetch('https://duel-masters-ai-bot.onrender.com/api/deck/build', {
+      fetch('https://revarend.pythonanywhere.com/api/deck/build', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ archetype: arch })
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnAnalyzeMyDeck.textContent = '⏳ Menganalisa Deck Anda...';
       btnAnalyzeMyDeck.disabled = true;
 
-      fetch('https://duel-masters-ai-bot.onrender.com/api/deck/analyze', {
+      fetch('https://revarend.pythonanywhere.com/api/deck/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ decklist: currentDeck })
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnResetLearn  = document.getElementById('btnResetLearning');
 
   function fetchLearningStats() {
-    fetch('https://duel-masters-ai-bot.onrender.com/api/learn/stats')
+    fetch('https://revarend.pythonanywhere.com/api/learn/stats')
       .then(r => r.json())
       .then(res => {
         if (!res.success || !res.data) return;
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnResetLearn) {
     btnResetLearn.addEventListener('click', () => {
       if (confirm('Apakah Anda yakin ingin me-reset memori pembelajaran AI ke awal?')) {
-        fetch('https://duel-masters-ai-bot.onrender.com/api/learn/reset', { method: 'POST' })
+        fetch('https://revarend.pythonanywhere.com/api/learn/reset', { method: 'POST' })
           .then(r => r.json())
           .then(() => {
             alert('Memori AI berhasil di-reset.');
