@@ -1,0 +1,136 @@
+{
+  "can_charge_mana": false,
+  "current_phase": "MAIN",
+  "is_player_turn": true,
+  "opponent": {
+    "battle_zone": [
+      {
+        "can_attack": false,
+        "id": "braid_claw",
+        "is_tapped": true,
+        "name": "Braid Claw",
+        "power": 1000
+      },
+      {
+        "can_attack": false,
+        "id": "mini_titan_gett",
+        "is_tapped": true,
+        "name": "Mini Titan Gett",
+        "power": 2000
+      },
+      {
+        "can_attack": true,
+        "id": "bronze_arm_tribe",
+        "is_tapped": false,
+        "name": "Bronze-Arm Tribe",
+        "power": 3000
+      }
+    ],
+    "deck_count": 27,
+    "graveyard": [],
+    "hand_size": 2,
+    "mana_zone": [
+      {
+        "id": "braid_claw",
+        "is_tapped": true,
+        "name": "Braid Claw"
+      },
+      {
+        "id": "crimson_hammer",
+        "is_tapped": true,
+        "name": "Crimson Hammer"
+      },
+      {
+        "id": "mini_titan_gett",
+        "is_tapped": true,
+        "name": "Mini Titan Gett"
+      },
+      {
+        "id": "bronze_arm_tribe",
+        "is_tapped": true,
+        "name": "Bronze-Arm Tribe"
+      }
+    ],
+    "name": "AI Duelist",
+    "shields_count": 5
+  },
+  "player": {
+    "battle_zone": [],
+    "deck_count": 26,
+    "graveyard": [
+      {
+        "id": "brain_serum",
+        "name": "Brain Serum"
+      }
+    ],
+    "hand": [
+      {
+        "cost": 2,
+        "id": "spiral_gate",
+        "is_playable": true,
+        "name": "Spiral Gate"
+      },
+      {
+        "cost": 4,
+        "id": "dia_nork_moonlight_guardian",
+        "is_playable": true,
+        "name": "Dia Nork, Moonlight Guardian"
+      },
+      {
+        "cost": 5,
+        "id": "corile",
+        "is_playable": false,
+        "name": "Corile"
+      },
+      {
+        "cost": 4,
+        "id": "brain_serum",
+        "is_playable": true,
+        "name": "Brain Serum"
+      },
+      {
+        "cost": 1,
+        "id": "la_ura_giga_sky_guardian",
+        "is_playable": true,
+        "name": "La Ura Giga, Sky Guardian"
+      },
+      {
+        "cost": 6,
+        "id": "aqua_surfer",
+        "is_playable": false,
+        "name": "Aqua Surfer"
+      },
+      {
+        "cost": 6,
+        "id": "alcadeias_lord_of_spirits",
+        "is_playable": false,
+        "name": "Alcadeias, Lord of Spirits"
+      }
+    ],
+    "mana_zone": [
+      {
+        "id": "la_ura_giga_sky_guardian",
+        "is_tapped": false,
+        "name": "La Ura Giga, Sky Guardian"
+      },
+      {
+        "id": "aqua_hulcus",
+        "is_tapped": false,
+        "name": "Aqua Hulcus"
+      },
+      {
+        "id": "holy_awe",
+        "is_tapped": false,
+        "name": "Holy Awe"
+      },
+      {
+        "id": "dia_nork_moonlight_guardian",
+        "is_tapped": false,
+        "name": "Dia Nork, Moonlight Guardian"
+      }
+    ],
+    "name": "Player",
+    "shields_count": 5
+  },
+  "turn_number": 8
+}
