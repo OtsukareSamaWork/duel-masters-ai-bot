@@ -1793,7 +1793,7 @@ function executeAutoplayStep(rec, state) {
     const sig = `EFFECT_${pick}`;
     if (!trackAction(sig)) return;
 
-    const optionBtns = document.querySelectorAll('.effect-option, #effect-use, #effect-keep, .effect-decision button, .choice-btn, button.btn');
+    const optionBtns = document.querySelectorAll('.effect-option, #effect-use, #effect-keep, .effect-decision button, .choice-btn, button.btn, button');
     for (const btn of optionBtns) {
       const txt = (btn.textContent || btn.getAttribute('aria-label') || '').toLowerCase();
       if (txt.includes(pick.toLowerCase()) || pick.toLowerCase().includes(txt)) {
@@ -1802,8 +1802,18 @@ function executeAutoplayStep(rec, state) {
         return;
       }
     }
-    if (optionBtns.length > 0) {
-      VirtualAgent.clickTarget(optionBtns[0], 'Opsi 1');
+    
+    // Jika ada tombol di bagian bawah layar yang sangat jelas adalah prompt (seperti shield trigger)
+    const promptBtns = document.querySelectorAll('.prompt button, .banner button, .shield-trigger button, .bottom-bar button');
+    if (promptBtns.length > 0) {
+      VirtualAgent.clickTarget(promptBtns[0], 'Opsi 1');
+      logAutoplay(`🎯 Efek: Memilih opsi pertama (Prompt)`);
+      return;
+    }
+
+    if (optionBtns.length > 0 && Array.from(optionBtns).some(b => b.closest('.modal, dialog, .effect-decision, .choice-dialog'))) {
+      const targetBtn = Array.from(optionBtns).find(b => b.closest('.modal, dialog, .effect-decision, .choice-dialog'));
+      VirtualAgent.clickTarget(targetBtn, 'Opsi 1');
       logAutoplay(`🎯 Efek: Memilih opsi pertama`);
       return;
     }
