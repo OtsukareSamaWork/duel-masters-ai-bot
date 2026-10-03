@@ -138,7 +138,7 @@ function readAndAnalyze() {
       updateStatus('🟢 Live Pro');
     }
   })
-  .catch(() => updateStatus('🔴 Bot Offline (jalankan run.py)'));
+  .catch(() => updateStatus('🔴 Bot Offline (Cek Server Cloud)'));
 }
 
 // ── OVERLAY ──
