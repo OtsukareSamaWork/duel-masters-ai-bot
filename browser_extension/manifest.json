@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "DMA Advisor",
+  "version": "3.0",
+  "description": "Real-time AI advisor untuk DuelOnline.online (Service Worker Architecture)",
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "host_permissions": [
+    "http://127.0.0.1:5000/*",
+    "http://localhost:5000/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "DMA Advisor"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://duelonline.online/*"],
+      "js": ["bridge.js"],
+      "all_frames": false,
+      "run_at": "document_idle",
+      "world": "ISOLATED"
+    },
+    {
+      "matches": ["*://duelonline.online/*"],
+      "js": ["reader.js"],
+      "all_frames": false,
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ]
+}
