@@ -209,6 +209,14 @@ class GameAdvisor:
             score = 0.0
             reasons = []
 
+            # Shield Trigger & Mandatory usage
+            if "summon for free" in name_lower or "use it now" in name_lower or "cast for free" in name_lower or "use" in name_lower:
+                score += 50.0
+                reasons.append("Aktifkan Shield Trigger gratis untuk membalikkan keadaan!")
+            elif "keep in hand" in name_lower:
+                score -= 10.0
+                reasons.append("Jangan simpan di tangan jika bisa digunakan gratis!")
+
             # Check if options are graveyard cards
             if is_graveyard_retrieval:
                 if any(k in name_lower for k in ["kilstine", "bolmeteus", "bombazar", "alcadeias", "ballom"]):
