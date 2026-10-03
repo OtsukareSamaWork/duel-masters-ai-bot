@@ -1,10 +1,10 @@
 // background.js — SERVICE WORKER
 // Menjalankan fetch API dari background untuk bypass CSP dan Mixed Content limit di website
 
-const ANALYZE_URL   = 'https://duel-masters-ai-bot.onrender.com/api/analyze';
-const CARDS_URL     = 'https://duel-masters-ai-bot.onrender.com/api/cards';
-const LEARN_MATCH_URL = 'https://duel-masters-ai-bot.onrender.com/api/learn/match';
-const LEARN_STATS_URL = 'https://duel-masters-ai-bot.onrender.com/api/learn/stats';
+const ANALYZE_URL   = 'https://revarend.pythonanywhere.com/api/analyze';
+const CARDS_URL     = 'https://revarend.pythonanywhere.com/api/cards';
+const LEARN_MATCH_URL = 'https://revarend.pythonanywhere.com/api/learn/match';
+const LEARN_STATS_URL = 'https://revarend.pythonanywhere.com/api/learn/stats';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'fetchCards') {
