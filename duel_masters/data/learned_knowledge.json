@@ -1,0 +1,260 @@
+{
+  "total_matches": 20,
+  "wins": 10,
+  "losses": 10,
+  "win_rate": 50.0,
+  "experience_points": 1500,
+  "ai_level": 6,
+  "archetype_frequencies": {
+    "Light / Angel Command": 10,
+    "Water/Darkness Control": 10
+  },
+  "opponent_common_cards": {
+    "La Ura Giga": 10,
+    "Holy Awe": 10,
+    "Terror Pit": 10,
+    "Aqua Surfer": 10,
+    "Corile": 10
+  },
+  "card_performance": {
+    "Bombazar, Dragon of Destiny": {
+      "played": 10,
+      "wins": 10,
+      "losses": 0,
+      "impact_score": 8.0
+    },
+    "Aqua Hulcus": {
+      "played": 10,
+      "wins": 10,
+      "losses": 0,
+      "impact_score": 8.0
+    },
+    "Bronze-Arm Tribe": {
+      "played": 10,
+      "wins": 10,
+      "losses": 0,
+      "impact_score": 8.0
+    },
+    "Pyrofighter Magnus": {
+      "played": 10,
+      "wins": 0,
+      "losses": 10,
+      "impact_score": 3.0
+    },
+    "Mini Titan Gett": {
+      "played": 10,
+      "wins": 0,
+      "losses": 10,
+      "impact_score": 3.0
+    }
+  },
+  "learned_combos": [
+    {
+      "key": "Bombazar, Dragon of Destiny + Bronze-Arm Tribe",
+      "cards": [
+        "Bronze-Arm Tribe",
+        "Bombazar, Dragon of Destiny"
+      ],
+      "name": "Kombo Bronze-Arm Tribe & Bombazar",
+      "times_seen": 10,
+      "wins": 10,
+      "win_rate": 100.0,
+      "discovered_at": "2026-10-01 23:31"
+    }
+  ],
+  "learned_weights": {
+    "mana_charge": {
+      "Bronze-Arm Tribe": -2.0,
+      "Aqua Hulcus": -2.0,
+      "Bombazar, Dragon of Destiny": -2.0
+    },
+    "combat_threat": {
+      "Terror Pit": 2.5,
+      "Aqua Surfer": 2.5,
+      "Corile": 2.5
+    },
+    "trigger_caution": 2.0
+  },
+  "match_history": [
+    {
+      "match_id": 20,
+      "timestamp": "2026-10-02 01:42",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 19,
+      "timestamp": "2026-10-02 01:42",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 18,
+      "timestamp": "2026-10-02 01:42",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 17,
+      "timestamp": "2026-10-02 01:42",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 16,
+      "timestamp": "2026-10-02 01:34",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 15,
+      "timestamp": "2026-10-02 01:34",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 14,
+      "timestamp": "2026-10-02 01:22",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 13,
+      "timestamp": "2026-10-02 01:22",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 12,
+      "timestamp": "2026-10-02 01:15",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 11,
+      "timestamp": "2026-10-02 01:15",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 10,
+      "timestamp": "2026-10-02 01:15",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 9,
+      "timestamp": "2026-10-02 01:15",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 8,
+      "timestamp": "2026-10-02 00:15",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 7,
+      "timestamp": "2026-10-02 00:15",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 6,
+      "timestamp": "2026-10-01 23:57",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 5,
+      "timestamp": "2026-10-01 23:57",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 4,
+      "timestamp": "2026-10-01 23:34",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 3,
+      "timestamp": "2026-10-01 23:34",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    },
+    {
+      "match_id": 2,
+      "timestamp": "2026-10-01 23:31",
+      "result": "LOSS",
+      "turns": 9,
+      "opponent_archetype": "Water/Darkness Control",
+      "cards_played_count": 2,
+      "xp_earned": 50
+    },
+    {
+      "match_id": 1,
+      "timestamp": "2026-10-01 23:31",
+      "result": "WIN",
+      "turns": 7,
+      "opponent_archetype": "Light / Angel Command",
+      "cards_played_count": 3,
+      "xp_earned": 100
+    }
+  ]
+}
