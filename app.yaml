@@ -1,0 +1,8 @@
+runtime: python311
+entrypoint: gunicorn -b :$PORT duel_masters.app:app
+
+instance_class: F1
+
+handlers:
+- url: /.*
+  script: auto
