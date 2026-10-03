@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isSyncOn) {
           statusDot.className = 'dot off';
           statusLabel.textContent = 'ERR';
-          statusDetail.textContent = '🔴 Server Offline (Jalankan run.py)';
+          statusDetail.textContent = '🔴 Server Offline (Cek Server Cloud)';
           statusDetail.style.color = '#e74c3c';
         } else {
           statusDetail.textContent = '🔴 Server Belum Jalan';
