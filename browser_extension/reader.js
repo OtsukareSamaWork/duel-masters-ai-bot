@@ -501,25 +501,29 @@ function scanDOM() {
   const stoneBtn = document.querySelector('.stone-end, .btn-end-turn, #btn-end-phase, .end-turn, .turn-btn, .stone');
   const stoneText = (stoneBtn?.textContent || '').toUpperCase().trim();
 
+  // JANGAN timpa isMyTurn = true hanya karena tombol batu berkata "SKIP MANA".
+  // Di Practice Mode, tombol batu bisa menampilkan phase AI.
   if (stoneText.includes('OPPONENT') || stoneText.includes('WAITING') || stoneText.includes('AI DUELIST') || stoneBtn?.classList.contains('waiting') || stoneBtn?.classList.contains('opponent')) {
     isMyTurn = false;
     phase = 'OPPONENT';
   } else if (stoneText.includes('SKIP MANA') || stoneText.includes('CHARGE MANA')) {
-    isMyTurn = true;
     phase = 'CHARGE';
   } else if (stoneText.includes('ATTACK PHASE')) {
-    isMyTurn = true;
     phase = 'MAIN';
   } else if (stoneText.includes('END TURN') || stoneText.includes('END PHASE') || stoneText.includes('PASS')) {
-    isMyTurn = true;
     phase = 'ATTACK';
+  } 
+
+  // Fallback / Extra Check dari Banner Header
+  const headerText = (document.querySelector('.table-turn-name, .turn-label, .centre-band, .turn-banner, .player-name-active')?.textContent || '').toUpperCase();
+  if (headerText.includes("AI DUELIST'S TURN") || headerText.includes("OPPONENT") || headerText.includes("ENEMY")) {
+    isMyTurn = false;
+  } else if (headerText.includes("YOUR TURN")) {
+    isMyTurn = true;
   } else if (!S || !S.game) {
     const pageText = (document.body.innerText || '').toUpperCase();
-    const turnMatch = pageText.match(/TURN\s*(\d+)/i) || document.querySelector('.table-turn-name, .turn-label, .centre-band')?.textContent?.match(/Turn\s*(\d+)/i);
-    turnNum = turnMatch ? parseInt(turnMatch[1]) : 1;
-    if (pageText.includes("YOUR TURN") || stoneText.includes('YOUR TURN')) {
-      isMyTurn = true;
-    }
+    const turnMatch = pageText.match(/TURN\s*(\d+)/i);
+    if (turnMatch) turnNum = parseInt(turnMatch[1]);
   }
 
   function normalizeCardKey(s) {
