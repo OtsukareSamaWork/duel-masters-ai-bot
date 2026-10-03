@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔️ Duel Masters Advisor</title>
+<style>
+:root {
+  --bg-dark: #1a1208;
+  --bg-panel: #2a1f0e;
+  --bg-card: #3a2c15;
+  --gold: #d4a843;
+  --gold-bright: #ffd700;
+  --text: #e8dcc8;
+  --text-dim: #9a8b73;
+  --border: #5a4a2a;
+  --light-color: #FFD700;
+  --water-color: #4169E1;
+  --darkness-color: #9B30FF;
+  --fire-color: #FF4500;
+  --nature-color: #228B22;
+  --success: #4CAF50;
+  --danger: #f44336;
+  --warning: #FF9800;
+  --info: #2196F3;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Header ──────────────────────────────── */
+.header {
+  background: linear-gradient(135deg, #2a1f0e 0%, #1a1208 100%);
+  border-bottom: 2px solid var(--gold);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header h1 {
+  font-size: 1.5rem;
+  color: var(--gold-bright);
+  text-shadow: 0 0 10px rgba(255,215,0,0.3);
+}
+.header-controls { display: flex; gap: 12px; align-items: center; }
+.header-controls label { color: var(--text-dim); font-size: 0.85rem; }
+.header-controls input, .header-controls select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: 60px;
+}
+.header-controls select { width: 100px; }
+
+/* ── Layout ──────────────────────────────── */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  min-height: calc(100vh - 52px);
+}
+.game-area { padding: 12px; }
+.advisor-panel {
+  background: var(--bg-panel);
+  border-left: 2px solid var(--gold);
+  padding: 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 52px);
+}
+
+/* ── Game Board ──────────────────────────── */
+.player-section {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.section-stats { display: flex; gap: 12px; font-size: 0.8rem; }
+.stat-badge {
+  background: var(--bg-card);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.stat-badge.shields { border-color: var(--light-color); color: var(--light-color); }
+.stat-badge.mana { border-color: var(--info); color: var(--info); }
+.stat-badge.deck { border-color: var(--text-dim); }
+.stat-badge.grave { border-color: var(--darkness-color); color: var(--darkness-color); }
+
+/* ── Zone ──────────────────────────────────  */
+.zone {
+  margin-bottom: 8px;
+}
+.zone-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 70px;
+  padding: 6px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  border: 1px dashed var(--border);
+}
+.card-row.drop-target { border-color: var(--gold); background: rgba(212,168,67,0.1); }
+
+/* ── Card ─────────────────────────────────  */
+.card {
+  width: 110px;
+  min-height: 60px;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 2px solid;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 10;
+}
+.card.tapped { opacity: 0.6; transform: rotate(8deg); }
+.card .card-name {
+  font-weight: 700;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card .card-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6rem;
+}
+.card .card-cost {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background: #333;
+  color: #fff;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border: 1px solid var(--gold);
+}
+.card .card-abilities {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+.ability-icon {
+  font-size: 0.55rem;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.3);
+}
+.card .remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--danger);
+  color: #fff;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 0.6rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.card:hover .remove-btn { display: flex; }
+
+/* Civilization colors */
+.card.LIGHT  { background: linear-gradient(135deg, #3a3000, #2a2000); border-color: var(--light-color); color: #ffe8a0; }
+.card.WATER  { background: linear-gradient(135deg, #0a1a3a, #0a1530); border-color: var(--water-color); color: #a0c8ff; }
+.card.DARKNESS { background: linear-gradient(135deg, #2a0a2a, #1a0520); border-color: var(--darkness-color); color: #d0a0ff; }
+.card.FIRE   { background: linear-gradient(135deg, #3a1000, #2a0a00); border-color: var(--fire-color); color: #ffa080; }
+.card.NATURE { background: linear-gradient(135deg, #0a2a0a, #051a05); border-color: var(--nature-color); color: #a0e0a0; }
+
+/* ── Card Tooltip ──────────────────────────  */
+.card-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1208;
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 10px;
+  width: 220px;
+  z-index: 1000;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+.card:hover .card-tooltip { display: block; }
+.card-tooltip .tt-name { font-weight: 700; color: var(--gold); font-size: 0.85rem; }
+.card-tooltip .tt-row { display: flex; justify-content: space-between; margin: 3px 0; }
+.card-tooltip .tt-effect {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+/* ── Separator ────────────────────────────  */
+.battle-separator {
+  text-align: center;
+  padding: 6px;
+  color: var(--gold);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  position: relative;
+}
+.battle-separator::before, .battle-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background: var(--border);
+}
+.battle-separator::before { left: 5%; }
+.battle-separator::after { right: 5%; }
+
+/* ── Card Input ──────────────────────────── */
+.input-section {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.input-section h3 {
+  color: var(--gold);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.search-box {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.search-box input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+.search-results {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+.search-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(90,74,42,0.3);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.search-result-item:hover { background: var(--bg-card); }
+.add-btns { display: flex; gap: 4px; }
+.add-btn {
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.65rem;
+}
+.add-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── Target toggle ──────────────────────── */
+.target-toggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 8px;
+}
+.target-toggle button {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.target-toggle button.active {
+  background: var(--gold);
+  color: var(--bg-dark);
+  font-weight: 700;
+}
+.target-toggle button:first-child { border-radius: 4px 0 0 4px; }
+.target-toggle button:last-child { border-radius: 0 4px 4px 0; }
+
+/* ── Advisor Panel ───────────────────────── */
+.advisor-panel h2 {
+  color: var(--gold-bright);
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.3);
+}
+.analyze-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--gold), #b8902a);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.analyze-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212,168,67,0.4);
+}
+.analyze-btn:active { transform: translateY(0); }
+
+.advisor-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.advisor-section h3 {
+  color: var(--gold);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.advisor-section .content {
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.score-bar {
+  height: 20px;
+  background: var(--bg-dark);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 6px 0;
+  display: flex;
+}
+.score-bar .player-side {
+  background: linear-gradient(90deg, var(--success), #66BB6A);
+  transition: width 0.5s;
+}
+.score-bar .opponent-side {
+  background: linear-gradient(90deg, #ef5350, var(--danger));
+  transition: width 0.5s;
+}
+
+.step-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border-bottom: 1px solid rgba(90,74,42,0.2);
+  font-size: 0.8rem;
+  align-items: flex-start;
+}
+.step-item .step-icon { font-size: 1.1rem; min-width: 24px; text-align: center; }
+.step-item .step-action { font-weight: 600; }
+.step-item .step-detail { color: var(--text-dim); font-size: 0.75rem; margin-top: 2px; }
+
+.priority-badge {
+  font-size: 0.6rem;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+.priority-badge.TERTINGGI, .priority-badge.KRITIS { background: var(--danger); color: #fff; }
+.priority-badge.TINGGI { background: var(--warning); color: #000; }
+.priority-badge.SEDANG { background: var(--info); color: #fff; }
+.priority-badge.RENDAH { background: var(--success); color: #fff; }
+.priority-badge.JANGAN { background: #666; color: #fff; }
+
+.strategy-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.strategy-badge.AGGRO { background: var(--fire-color); color: #fff; }
+.strategy-badge.MIDRANGE { background: var(--nature-color); color: #fff; }
+.strategy-badge.CONTROL { background: var(--water-color); color: #fff; }
+
+.tip-list { list-style: none; padding: 0; }
+.tip-list li { padding: 3px 0 3px 16px; position: relative; font-size: 0.78rem; }
+.tip-list li::before { content: '▸'; position: absolute; left: 0; color: var(--gold); }
+
+.lethal-banner {
+  background: linear-gradient(135deg, #b71c1c, #f44336);
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  animation: pulse 1.5s infinite;
+  margin-bottom: 10px;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(244,67,54,0.5); }
+  50% { box-shadow: 0 0 20px rgba(244,67,54,0.8); }
+}
+
+/* ── Import/Export ───────────────────────── */
+.io-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.io-btn {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.io-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 20px;
+  width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal h3 { color: var(--gold); margin-bottom: 12px; }
+.modal textarea {
+  width: 100%;
+  min-height: 200px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+.modal-buttons { display: flex; gap: 8px; margin-top: 10px; }
+.modal-buttons button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.modal-buttons .primary {
+  background: var(--gold);
+  color: var(--bg-dark);
+  font-weight: 700;
+  border-color: var(--gold);
+}
+.modal-buttons .secondary {
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.no-results { color: var(--text-dim); font-size: 0.8rem; padding: 10px; text-align: center; font-style: italic; }
+
+/* ── Scrollbar ──────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>⚔️ Duel Masters Advisor</h1>
+  <div class="header-controls">
+    <label>Turn: <input type="number" id="turnNumber" value="1" min="1"></label>
+    <label>Phase:
+      <select id="gamePhase">
+        <option value="CHARGE">Charge</option>
+        <option value="MAIN" selected>Main</option>
+        <option value="ATTACK">Attack</option>
+        <option value="END">End</option>
+      </select>
+    </label>
+  </div>
+</div>
+
+<!-- Main Layout -->
+<div class="main-layout">
+  <!-- Game Area -->
+  <div class="game-area">
+
+    <!-- Opponent Section -->
+    <div class="player-section" id="opponentSection">
+      <div class="section-header">
+        <span class="section-title">👤 Lawan (Opponent)</span>
+        <div class="section-stats">
+          <span class="stat-badge shields" id="oppShields">🛡️ 5</span>
+          <span class="stat-badge mana" id="oppMana">💧 0</span>
+          <span class="stat-badge deck">📚 <input type="number" id="oppDeckCount" value="30" min="0" max="40" style="width:35px;background:transparent;border:none;color:inherit;font-size:inherit;"></span>
+          <span class="stat-badge grave">💀 0</span>
+          <span>Hand: <input type="number" id="oppHandCount" value="5" min="0" max="20" style="width:35px;background:var(--bg-card);border:1px solid var(--border);color:var(--text);border-radius:3px;text-align:center;"></span>
+        </div>
+      </div>
+      <div class="zone">
+        <div class="zone-label">Mana Zone</div>
+        <div class="card-row" id="oppManaZone" data-zone="opp-mana"></div>
+      </div>
+      <div class="zone">
+        <div class="zone-label">Battle Zone</div>
+        <div class="card-row" id="oppBattleZone" data-zone="opp-battle"></div>
+      </div>
+    </div>
+
+    <!-- Battle Separator -->
+    <div class="battle-separator">⚔ BATTLEFIELD ⚔</div>
+
+    <!-- Player Section -->
+    <div class="player-section" id="playerSection">
+      <div class="section-header">
+        <span class="section-title">👤 Kamu (Player)</span>
+        <div class="section-stats">
+          <span class="stat-badge shields" id="playerShields">🛡️ 5</span>
+          <span class="stat-badge mana" id="playerMana">💧 0</span>
+          <span class="stat-badge deck">📚 <input type="number" id="playerDeckCount" value="30" min="0" max="40" style="width:35px;background:transparent;border:none;color:inherit;font-size:inherit;"></span>
+          <span class="stat-badge grave">💀 0</span>
+        </div>
+      </div>
+      <div class="zone">
+        <div class="zone-label">Battle Zone</div>
+        <div class="card-row" id="playerBattleZone" data-zone="player-battle"></div>
+      </div>
+      <div class="zone">
+        <div class="zone-label">Mana Zone</div>
+        <div class="card-row" id="playerManaZone" data-zone="player-mana"></div>
+      </div>
+      <div class="zone">
+        <div class="zone-label">Hand</div>
+        <div class="card-row" id="playerHand" data-zone="player-hand"></div>
+      </div>
+      <div class="zone">
+        <div class="zone-label">Graveyard</div>
+        <div class="card-row" id="playerGraveyard" data-zone="player-grave" style="min-height:40px;"></div>
+      </div>
+    </div>
+
+    <!-- Card Input Section -->
+    <div class="input-section">
+      <h3 onclick="toggleInput()">➕ Tambah Kartu (klik untuk buka/tutup)</h3>
+      <div id="inputContent">
+        <div class="target-toggle">
+          <button class="active" onclick="setTarget('player', this)">🟢 Player</button>
+          <button onclick="setTarget('opponent', this)">🔴 Opponent</button>
+        </div>
+        <div class="search-box">
+          <input type="text" id="cardSearch" placeholder="Cari kartu..." oninput="searchCards(this.value)">
+        </div>
+        <div class="search-results" id="searchResults"></div>
+        <div class="io-buttons">
+          <button class="io-btn" onclick="openExportModal()">📤 Export State</button>
+          <button class="io-btn" onclick="openImportModal()">📥 Import State</button>
+          <button class="io-btn" onclick="loadPreset()">🎮 Load Sample</button>
+          <button class="io-btn" onclick="clearAll()">🗑️ Clear All</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Advisor Panel -->
+  <div class="advisor-panel">
+    <h2>🧠 AI Advisor</h2>
+    <button class="analyze-btn" onclick="analyzeState()">⚡ ANALISA SEKARANG</button>
+
+    <div id="advisorContent">
+      <div class="advisor-section">
+        <h3>📋 Petunjuk</h3>
+        <div class="content">
+          <p>1. Tambah kartu ke zona yang sesuai menggunakan panel pencarian di bawah.</p>
+          <p>2. Set jumlah turn, shields, dan deck count.</p>
+          <p>3. Klik <strong>ANALISA SEKARANG</strong> untuk mendapat rekomendasi.</p>
+          <p style="margin-top:8px;color:var(--gold);">💡 Coba klik "Load Sample" untuk contoh game state.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import/Export Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Export Game State</h3>
+    <textarea id="modalTextarea"></textarea>
+    <div class="modal-buttons">
+      <button class="secondary" onclick="closeModal()">Tutup</button>
+      <button class="primary" id="modalAction" onclick="doModalAction()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State Management ──────────────────────────
+const GameManager = {
+  target: 'player', // 'player' or 'opponent'
+  cardsDB: [],
+  state: {
+    player: { hand: [], mana_zone: [], battle_zone: [], graveyard: [], shields_count: 5 },
+    opponent: { hand: [], mana_zone: [], battle_zone: [], graveyard: [], shields_count: 5 },
+  },
+
+  addCard(cardData, zone) {
+    const target = this.target;
+    const inst = { ...cardData, instance_id: 'i' + Math.random().toString(36).substr(2, 6), is_tapped: false, summoning_sickness: zone === 'battle' };
+    this.state[target][zone === 'hand' ? 'hand' : zone === 'mana' ? 'mana_zone' : zone === 'battle' ? 'battle_zone' : 'graveyard'].push(inst);
+    this.render();
+  },
+
+  removeCard(target, zoneKey, instanceId) {
+    const arr = this.state[target][zoneKey];
+    const idx = arr.findIndex(c => c.instance_id === instanceId);
+    if (idx >= 0) arr.splice(idx, 1);
+    this.render();
+  },
+
+  toggleTap(target, zoneKey, instanceId) {
+    const card = this.state[target][zoneKey].find(c => c.instance_id === instanceId);
+    if (card) card.is_tapped = !card.is_tapped;
+    this.render();
+  },
+
+  render() {
+    this.renderZone('playerHand', this.state.player.hand, 'player', 'hand');
+    this.renderZone('playerManaZone', this.state.player.mana_zone, 'player', 'mana_zone');
+    this.renderZone('playerBattleZone', this.state.player.battle_zone, 'player', 'battle_zone');
+    this.renderZone('playerGraveyard', this.state.player.graveyard, 'player', 'graveyard');
+    this.renderZone('oppManaZone', this.state.opponent.mana_zone, 'opponent', 'mana_zone');
+    this.renderZone('oppBattleZone', this.state.opponent.battle_zone, 'opponent', 'battle_zone');
+    this.updateStats();
+  },
+
+  renderZone(elementId, cards, target, zoneKey) {
+    const el = document.getElementById(elementId);
+    if (!cards.length) {
+      el.innerHTML = '<div class="no-results">Kosong</div>';
+      return;
+    }
+    el.innerHTML = cards.map(c => this.cardHTML(c, target, zoneKey)).join('');
+  },
+
+  cardHTML(card, target, zoneKey) {
+    const civ = (card.civilization || [])[0] || 'LIGHT';
+    const tapped = card.is_tapped ? 'tapped' : '';
+    const abilities = (card.abilities || []).map(a => {
+      const icons = { BLOCKER:'🛡', SPEED_ATTACKER:'⚡', DOUBLE_BREAKER:'💥', TRIPLE_BREAKER:'💥💥', SHIELD_TRIGGER:'🔰', SLAYER:'☠️', UNBLOCKABLE:'👻', POWER_ATTACKER:'💪' };
+      return `<span class="ability-icon" title="${a}">${icons[a]||a.charAt(0)}</span>`;
+    }).join('');
+    const powerText = card.power != null ? card.power : '-';
+    return `
+      <div class="card ${civ} ${tapped}" ondblclick="GameManager.toggleTap('${target}','${zoneKey}','${card.instance_id}')" title="Double-click to tap/untap">
+        <span class="card-cost">${card.cost}</span>
+        <button class="remove-btn" onclick="event.stopPropagation();GameManager.removeCard('${target}','${zoneKey}','${card.instance_id}')">✕</button>
+        <div class="card-name">${card.name}</div>
+        <div class="card-stats">
+          <span>⚔ ${powerText}</span>
+          <span>${card.card_type === 'SPELL' ? '📜' : '👾'}</span>
+        </div>
+        <div class="card-abilities">${abilities}</div>
+        <div class="card-tooltip">
+          <div class="tt-name">${card.name}</div>
+          <div class="tt-row"><span>Cost:</span><span>${card.cost}</span></div>
+          <div class="tt-row"><span>Power:</span><span>${powerText}</span></div>
+          <div class="tt-row"><span>Type:</span><span>${card.card_type}</span></div>
+          <div class="tt-row"><span>Civ:</span><span>${(card.civilization||[]).join(', ')}</span></div>
+          <div class="tt-row"><span>Race:</span><span>${(card.race||[]).join(', ')||'-'}</span></div>
+          <div class="tt-row"><span>Abilities:</span><span>${(card.abilities||[]).join(', ')||'-'}</span></div>
+          ${card.effect_text ? `<div class="tt-effect">${card.effect_text}</div>` : ''}
+        </div>
+      </div>`;
+  },
+
+  updateStats() {
+    const p = this.state.player;
+    const o = this.state.opponent;
+    document.getElementById('playerShields').textContent = '🛡️ ' + (p.shields_count || 5);
+    document.getElementById('playerMana').textContent = '💧 ' + p.mana_zone.filter(c=>!c.is_tapped).length + '/' + p.mana_zone.length;
+    document.getElementById('oppShields').textContent = '🛡️ ' + (o.shields_count || 5);
+    document.getElementById('oppMana').textContent = '💧 ' + o.mana_zone.filter(c=>!c.is_tapped).length + '/' + o.mana_zone.length;
+  },
+
+  getFullState() {
+    return {
+      turn_number: parseInt(document.getElementById('turnNumber').value) || 1,
+      current_phase: document.getElementById('gamePhase').value,
+      is_player_turn: true,
+      player: {
+        name: 'Player',
+        hand: this.state.player.hand,
+        mana_zone: this.state.player.mana_zone,
+        battle_zone: this.state.player.battle_zone,
+        graveyard: this.state.player.graveyard,
+        shields_count: this.state.player.shields_count,
+        deck_count: parseInt(document.getElementById('playerDeckCount').value) || 30,
+      },
+      opponent: {
+        name: 'Opponent',
+        hand: this.state.opponent.hand,
+        mana_zone: this.state.opponent.mana_zone,
+        battle_zone: this.state.opponent.battle_zone,
+        graveyard: this.state.opponent.graveyard,
+        shields_count: this.state.opponent.shields_count,
+        deck_count: parseInt(document.getElementById('oppDeckCount').value) || 30,
+      },
+    };
+  },
+
+  loadState(data) {
+    if (data.player) {
+      this.state.player.hand = data.player.hand || [];
+      this.state.player.mana_zone = data.player.mana_zone || [];
+      this.state.player.battle_zone = data.player.battle_zone || [];
+      this.state.player.graveyard = data.player.graveyard || [];
+      this.state.player.shields_count = data.player.shields_count ?? 5;
+    }
+    if (data.opponent) {
+      this.state.opponent.hand = data.opponent.hand || [];
+      this.state.opponent.mana_zone = data.opponent.mana_zone || [];
+      this.state.opponent.battle_zone = data.opponent.battle_zone || [];
+      this.state.opponent.graveyard = data.opponent.graveyard || [];
+      this.state.opponent.shields_count = data.opponent.shields_count ?? 5;
+    }
+    if (data.turn_number) document.getElementById('turnNumber').value = data.turn_number;
+    if (data.current_phase) document.getElementById('gamePhase').value = data.current_phase;
+    this.render();
+  }
+};
+
+let realtimeTimeout;
+function triggerRealtimeAnalysis() {
+  clearTimeout(realtimeTimeout);
+  const btn = document.querySelector('.analyze-btn');
+  btn.innerHTML = '⚡ Menganalisa Perubahan...';
+  btn.style.background = 'linear-gradient(135deg, #2196F3, #1976D2)';
+  btn.style.color = '#fff';
+  realtimeTimeout = setTimeout(() => {
+    analyzeState();
+  }, 400); // 400ms debounce
+}
+
+// Intercept state changes to trigger analysis
+const originalRender = GameManager.render;
+GameManager.render = function() {
+  originalRender.apply(this, arguments);
+  triggerRealtimeAnalysis();
+};
+
+const originalUpdateStats = GameManager.updateStats;
+GameManager.updateStats = function() {
+  originalUpdateStats.apply(this, arguments);
+  triggerRealtimeAnalysis();
+};
+
+// ── Shield controls ───────────────────────
+document.getElementById('playerShields').onclick = function() {
+  const cur = GameManager.state.player.shields_count || 5;
+  const val = prompt('Player shields (0-5):', cur);
+  if (val !== null) { GameManager.state.player.shields_count = Math.max(0, Math.min(10, parseInt(val)||0)); GameManager.updateStats(); }
+};
+document.getElementById('oppShields').onclick = function() {
+  const cur = GameManager.state.opponent.shields_count || 5;
+  const val = prompt('Opponent shields (0-5):', cur);
+  if (val !== null) { GameManager.state.opponent.shields_count = Math.max(0, Math.min(10, parseInt(val)||0)); GameManager.updateStats(); }
+};
+
+// ── UI Functions ──────────────────────────
+function setTarget(target, btn) {
+  GameManager.target = target;
+  document.querySelectorAll('.target-toggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleInput() {
+  const el = document.getElementById('inputContent');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+let searchTimeout;
+function searchCards(query) {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(async () => {
+    const res = await fetch('/api/cards/search?q=' + encodeURIComponent(query));
+    const cards = await res.json();
+    renderSearchResults(cards);
+  }, 200);
+}
+
+function renderSearchResults(cards) {
+  const el = document.getElementById('searchResults');
+  if (!cards.length) { el.innerHTML = '<div class="no-results">Tidak ditemukan</div>'; return; }
+  el.innerHTML = cards.map(c => {
+    const civ = (c.civilization||[])[0]||'';
+    const civColors = { LIGHT:'var(--light-color)', WATER:'var(--water-color)', DARKNESS:'var(--darkness-color)', FIRE:'var(--fire-color)', NATURE:'var(--nature-color)' };
+    return `<div class="search-result-item">
+      <span style="border-left:3px solid ${civColors[civ]||'#666'};padding-left:6px;">
+        <strong>${c.name}</strong> <span style="color:var(--text-dim);font-size:0.7rem;">${c.cost}⬢ ${c.power||'-'}⚔ ${c.card_type}</span>
+      </span>
+      <div class="add-btns">
+        <button class="add-btn" onclick='GameManager.addCard(${JSON.stringify(c).replace(/'/g,"\\'")},"hand")'>✋Hand</button>
+        <button class="add-btn" onclick='GameManager.addCard(${JSON.stringify(c).replace(/'/g,"\\'")},"mana")'>💧Mana</button>
+        <button class="add-btn" onclick='GameManager.addCard(${JSON.stringify(c).replace(/'/g,"\\'")},"battle")'>⚔Battle</button>
+        <button class="add-btn" onclick='GameManager.addCard(${JSON.stringify(c).replace(/'/g,"\\'")},"grave")'>💀Grave</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Analyze ───────────────────────────────
+async function analyzeState() {
+  const btn = document.querySelector('.analyze-btn');
+  btn.textContent = '⏳ Menganalisa...';
+  btn.disabled = true;
+
+  try {
+    const state = GameManager.getFullState();
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state),
+    });
+    const data = await res.json();
+    if (data.success) {
+      renderAdvisorResults(data.recommendations);
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.innerHTML = '⚡ ANALISA SEKARANG';
+    btn.style.background = 'linear-gradient(135deg, var(--gold), #b8902a)';
+    btn.style.color = 'var(--bg-dark)';
+    btn.disabled = false;
+  }
+}
+
+function renderAdvisorResults(rec) {
+  const el = document.getElementById('advisorContent');
+  let html = '';
+
+  // Lethal check
+  const lethal = rec.board_analysis?.lethal_info;
+  if (lethal?.has_lethal) {
+    html += `<div class="lethal-banner">🏆 LETHAL TERDETEKSI! SERANG UNTUK MENANG!</div>`;
+  }
+
+  // Board Analysis
+  const ba = rec.board_analysis || {};
+  html += `<div class="advisor-section">
+    <h3>📊 Analisa Board</h3>
+    <div class="content">
+      <div style="text-align:center;font-size:1.1rem;font-weight:700;margin-bottom:6px;color:${ba.overall_score>0?'var(--success)':ba.overall_score<0?'var(--danger)':'var(--text)'}">
+        ${ba.advantage || 'Seimbang'} (${ba.overall_score > 0 ? '+' : ''}${ba.overall_score || 0})
+      </div>
+      <div class="score-bar">
+        <div class="player-side" style="width:${ba.board_control?.player_percentage || 50}%"></div>
+        <div class="opponent-side" style="width:${ba.board_control?.opponent_percentage || 50}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);">
+        <span>Player ${ba.board_control?.player_percentage || 50}%</span>
+        <span>Opponent ${ba.board_control?.opponent_percentage || 50}%</span>
+      </div>
+      <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.75rem;">
+        <span>🛡 Shield: ${ba.shield_advantage > 0 ? '+' : ''}${ba.shield_advantage || 0}</span>
+        <span>💧 Mana: ${ba.mana_advantage > 0 ? '+' : ''}${ba.mana_advantage || 0}</span>
+        <span>✋ Hand: ${ba.hand_advantage > 0 ? '+' : ''}${ba.hand_advantage || 0}</span>
+        <span>👾 Creatures: ${ba.player_creature_count || 0} vs ${ba.opponent_creature_count || 0}</span>
+        <span>⚔ Power: ${ba.player_board_power || 0}</span>
+        <span>🛡 Blockers: ${ba.player_blocker_count || 0} vs ${ba.opponent_blocker_count || 0}</span>
+      </div>
+    </div>
+  </div>`;
+
+  // Strategy
+  const strat = rec.overall_strategy || {};
+  if (strat.strategy) {
+    html += `<div class="advisor-section">
+      <h3>🎯 Strategi</h3>
+      <div class="content">
+        <span class="strategy-badge ${strat.strategy}">${strat.name || strat.strategy}</span>
+        <p style="margin:6px 0;">${strat.description || ''}</p>
+        <ul class="tip-list">${(strat.tips||[]).map(t => `<li>${t}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+  }
+
+  // Turn Plan
+  const plan = rec.turn_plan || [];
+  if (plan.length) {
+    html += `<div class="advisor-section">
+      <h3>📝 Rencana Turn</h3>
+      <div class="content">${plan.map(s => `
+        <div class="step-item">
+          <span class="step-icon">${s.icon || '▶'}</span>
+          <div>
+            <div class="step-action">${s.action}</div>
+            <div class="step-detail">${s.detail || ''}</div>
+            ${s.risk ? `<span class="priority-badge ${s.risk}">Risk: ${s.risk}</span>` : ''}
+          </div>
+        </div>
+      `).join('')}</div>
+    </div>`;
+  }
+
+  // Mana Charge
+  const mc = rec.mana_charge || {};
+  if (mc.action) {
+    html += `<div class="advisor-section">
+      <h3>⚡ Mana Charge</h3>
+      <div class="content">
+        ${mc.action === 'CHARGE' && mc.card ? `
+          <p><strong>Charge: ${mc.card.name}</strong></p>
+          <p style="color:var(--text-dim);font-size:0.75rem;">${mc.reason}</p>
+          ${mc.alternatives?.length ? `<p style="margin-top:6px;font-size:0.75rem;">Alternatif: ${mc.alternatives.map(a => a.card?.name || '-').join(', ')}</p>` : ''}
+        ` : `<p>${mc.reason}</p>`}
+      </div>
+    </div>`;
+  }
+
+  // Play Recommendations
+  const plays = rec.plays || [];
+  if (plays.length && plays[0].cards?.length) {
+    html += `<div class="advisor-section">
+      <h3>🃏 Rekomendasi Play</h3>
+      <div class="content">${plays.slice(0,5).map((p, i) => `
+        <div class="step-item" style="background:${i===0?'rgba(76,175,80,0.1)':'transparent'};">
+          <span class="step-icon">${i===0?'⭐':'▸'}</span>
+          <div>
+            <div class="step-action">${p.cards.map(c=>c.name).join(' + ')} <span style="font-weight:400;color:var(--text-dim);font-size:0.7rem;">(${p.total_cost}💧)</span></div>
+            <div class="step-detail">${p.reasoning}</div>
+            <div style="font-size:0.65rem;color:var(--gold);">Score: ${p.score}</div>
+          </div>
+        </div>
+      `).join('')}</div>
+    </div>`;
+  }
+
+  // Attack Recommendations
+  const attacks = rec.attacks || [];
+  if (attacks.length && attacks[0].action !== 'NONE') {
+    html += `<div class="advisor-section">
+      <h3>⚔️ Rekomendasi Serangan</h3>
+      <div class="content">${attacks.map(a => `
+        <div class="step-item">
+          <span class="step-icon">⚔️</span>
+          <div>
+            <div class="step-action">${a.action === 'GO_FOR_LETHAL' ? '🏆 GO FOR LETHAL!' : (a.attacker?.name || '-')}
+              ${a.priority ? `<span class="priority-badge ${a.priority}">${a.priority}</span>` : ''}
+            </div>
+            <div class="step-detail">${a.reasoning}</div>
+            ${a.risk ? `<div style="font-size:0.65rem;color:var(--warning);">⚠ Risk: ${a.risk_detail || a.risk}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}</div>
+    </div>`;
+  }
+
+  // Threats
+  const threats = ba.threats || [];
+  if (threats.length) {
+    html += `<div class="advisor-section">
+      <h3>⚠️ Ancaman Lawan</h3>
+      <div class="content">${threats.map(t => `
+        <div class="step-item">
+          <span class="step-icon">👾</span>
+          <div>
+            <div class="step-action">${t.creature} (${t.power}⚔) <span class="priority-badge ${t.danger_level}">${t.danger_level}</span></div>
+            <div class="step-detail">${t.reason}</div>
+          </div>
+        </div>
+      `).join('')}</div>
+    </div>`;
+  }
+
+  // Lethal Info
+  if (lethal && !lethal.has_lethal) {
+    html += `<div class="advisor-section">
+      <h3>🎯 Potensi Lethal</h3>
+      <div class="content">
+        <p>${lethal.reason}</p>
+        <p style="font-size:0.75rem;color:var(--text-dim);">Shields bisa dibreak: ${lethal.shields_can_break} | Blocker di jalan: ${lethal.blockers_in_way}</p>
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ── Import / Export ───────────────────────
+let modalMode = 'export';
+function openExportModal() {
+  modalMode = 'export';
+  document.getElementById('modalTitle').textContent = 'Export Game State';
+  document.getElementById('modalTextarea').value = JSON.stringify(GameManager.getFullState(), null, 2);
+  document.getElementById('modalAction').textContent = 'Copy';
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function openImportModal() {
+  modalMode = 'import';
+  document.getElementById('modalTitle').textContent = 'Import Game State';
+  document.getElementById('modalTextarea').value = '';
+  document.getElementById('modalAction').textContent = 'Import';
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+function doModalAction() {
+  if (modalMode === 'export') {
+    navigator.clipboard.writeText(document.getElementById('modalTextarea').value);
+    alert('Copied!');
+  } else {
+    try {
+      const data = JSON.parse(document.getElementById('modalTextarea').value);
+      GameManager.loadState(data);
+      closeModal();
+    } catch(e) { alert('Invalid JSON: ' + e.message); }
+  }
+}
+
+// ── Preset ────────────────────────────────
+function loadPreset() {
+  // Sample game from the screenshot
+  const preset = {
+    turn_number: 5,
+    current_phase: "MAIN",
+    is_player_turn: true,
+    player: {
+      name: "Revarend",
+      hand: [
+        {"id":"water_01","name":"Aqua Hulcus","civilization":["WATER"],"cost":3,"power":2000,"card_type":"CREATURE","abilities":[],"race":["Liquid People"],"effect_text":"When you put this creature into the battle zone, draw a card.","shield_trigger":false},
+        {"id":"fire_09","name":"Bombazar, Dragon of Destiny","civilization":["FIRE"],"cost":7,"power":7000,"card_type":"CREATURE","abilities":["SPEED_ATTACKER","DOUBLE_BREAKER"],"race":["Armored Dragon","Earth Dragon"],"effect_text":"Speed attacker. Double breaker. When this creature wins a battle, you may take an extra turn.","shield_trigger":false},
+        {"id":"nature_01","name":"Bronze-Arm Tribe","civilization":["NATURE"],"cost":3,"power":1000,"card_type":"CREATURE","abilities":[],"race":["Beast Folk"],"effect_text":"When you put this creature into the battle zone, put the top card of your deck into your mana zone.","shield_trigger":false},
+        {"id":"dark_03","name":"Ghost Touch","civilization":["DARKNESS"],"cost":2,"power":null,"card_type":"SPELL","abilities":[],"race":[],"effect_text":"Your opponent discards a card from their hand at random.","shield_trigger":false},
+        {"id":"water_03","name":"Corile","civilization":["WATER"],"cost":5,"power":2000,"card_type":"CREATURE","abilities":[],"race":["Cyber Lord"],"effect_text":"When you put this creature into the battle zone, put one of your opponent's creatures on top of their deck.","shield_trigger":false}
+      ],
+      mana_zone: [
+        {"id":"m1","name":"Torcon","civilization":["NATURE"],"cost":2,"power":3000,"card_type":"CREATURE","abilities":[],"race":["Colony Beetle"],"effect_text":"","shield_trigger":false,"is_tapped":false},
+        {"id":"m2","name":"Skeleton Soldier, the Defiled","civilization":["DARKNESS"],"cost":2,"power":2000,"card_type":"CREATURE","abilities":[],"race":["Living Dead"],"effect_text":"","shield_trigger":false,"is_tapped":false}
+      ],
+      battle_zone: [],
+      graveyard: [],
+      shields_count: 5,
+      deck_count: 28
+    },
+    opponent: {
+      name: "AI Duelist",
+      hand: [],
+      mana_zone: [
+        {"id":"om1","name":"La Ura Giga, Sky Guardian","civilization":["LIGHT"],"cost":1,"power":2000,"card_type":"CREATURE","abilities":[],"race":["Guardian"],"effect_text":"","shield_trigger":false,"is_tapped":true},
+        {"id":"om2","name":"Toel, Vizier of Hope","civilization":["LIGHT"],"cost":3,"power":1500,"card_type":"CREATURE","abilities":["BLOCKER"],"race":["Initiate"],"effect_text":"","shield_trigger":false,"is_tapped":true}
+      ],
+      battle_zone: [
+        {"id":"ob1","name":"Gran Gure, Space Guardian","civilization":["LIGHT"],"cost":6,"power":9000,"card_type":"CREATURE","abilities":["BLOCKER"],"race":["Guardian"],"effect_text":"Cannot attack players.","shield_trigger":false,"is_tapped":false,"summoning_sickness":false}
+      ],
+      graveyard: [],
+      shields_count: 5,
+      deck_count: 28
+    }
+  };
+  GameManager.loadState(preset);
+  document.getElementById('turnNumber').value = 5;
+  document.getElementById('gamePhase').value = 'MAIN';
+  document.getElementById('playerDeckCount').value = 28;
+  document.getElementById('oppDeckCount').value = 28;
+  document.getElementById('oppHandCount').value = 5;
+}
+
+function clearAll() {
+  GameManager.state = {
+    player: { hand: [], mana_zone: [], battle_zone: [], graveyard: [], shields_count: 5 },
+    opponent: { hand: [], mana_zone: [], battle_zone: [], graveyard: [], shields_count: 5 },
+  };
+  GameManager.render();
+  document.getElementById('advisorContent').innerHTML = '<div class="advisor-section"><h3>📋 Siap dianalisa</h3><div class="content">Tambahkan kartu lalu klik Analisa.</div></div>';
+}
+
+// ── Init ──────────────────────────────────
+(async function init() {
+  const res = await fetch('/api/cards');
+  GameManager.cardsDB = await res.json();
+  renderSearchResults(GameManager.cardsDB.slice(0, 15));
+  GameManager.render();
+})();
+</script>
+</body>
+</html>
