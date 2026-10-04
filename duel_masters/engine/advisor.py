@@ -1339,8 +1339,10 @@ class GameAdvisor:
         # ════════════════════════════════════════════════
         if (phase == GamePhase.CHARGE or (phase == GamePhase.MAIN and can_charge)) and state.player.hand:
             charge_advice = self._simulate_best_charge(state)
-            if charge_advice and charge_advice[0].get("action", "").startswith("Charge Mana:"):
-                return charge_advice
+            if charge_advice:
+                action_text = charge_advice[0].get("action", "")
+                if action_text.startswith("Charge Mana:") or "Lewati" in action_text or "LEWATI" in action_text:
+                    return charge_advice
 
         # ════════════════════════════════════════════════
         # 2. MAIN PHASE: Simulate all playable cards
