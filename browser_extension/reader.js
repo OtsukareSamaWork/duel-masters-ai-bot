@@ -498,21 +498,28 @@ function scanDOM() {
   }
 
   // Dual Check via Stone Button (Ground Truth di UI DuelOnline)
-  const stoneBtn = document.querySelector('.stone-end, .btn-end-turn, #btn-end-phase, .end-turn, .turn-btn, .stone');
-  const stoneText = (stoneBtn?.textContent || '').toUpperCase().trim();
+  const actionBtns = Array.from(document.querySelectorAll('.stone-end, .btn-end-turn, #btn-end-phase, .end-turn, .turn-btn, .stone, button'));
+  const hasSkipMana = actionBtns.some(b => (b.textContent || '').toUpperCase().includes('SKIP MANA'));
+  const hasAttackPhase = actionBtns.some(b => (b.textContent || '').toUpperCase().includes('ATTACK PHASE'));
+  const hasEndTurn = actionBtns.some(b => {
+    const t = (b.textContent || '').toUpperCase();
+    return (t.includes('END TURN') || t.includes('END PHASE')) && !t.includes('SKIP MANA'); 
+  });
+  const hasOpponent = actionBtns.some(b => {
+    const t = (b.textContent || '').toUpperCase();
+    return t.includes('OPPONENT') || t.includes('WAITING') || t.includes('AI DUELIST') || b.classList.contains('waiting') || b.classList.contains('opponent');
+  });
 
-  // JANGAN timpa isMyTurn = true hanya karena tombol batu berkata "SKIP MANA".
-  // Di Practice Mode, tombol batu bisa menampilkan phase AI.
-  if (stoneText.includes('OPPONENT') || stoneText.includes('WAITING') || stoneText.includes('AI DUELIST') || stoneBtn?.classList.contains('waiting') || stoneBtn?.classList.contains('opponent')) {
+  if (hasOpponent) {
     isMyTurn = false;
     phase = 'OPPONENT';
-  } else if (stoneText.includes('SKIP MANA') || stoneText.includes('CHARGE MANA')) {
+  } else if (hasSkipMana) {
     phase = 'CHARGE';
-  } else if (stoneText.includes('ATTACK PHASE')) {
+  } else if (hasAttackPhase) {
     phase = 'MAIN';
-  } else if (stoneText.includes('END TURN') || stoneText.includes('END PHASE') || stoneText.includes('PASS')) {
+  } else if (hasEndTurn) {
     phase = 'ATTACK';
-  } 
+  }
 
   // Fallback / Extra Check dari Banner Header
   const headerText = (document.querySelector('.table-turn-name, .turn-label, .centre-band, .turn-banner, .player-name-active')?.textContent || '').toUpperCase();
@@ -1841,6 +1848,20 @@ function executeAutoplayStep(rec, state) {
   const isChargeAction = planActionLower.includes('charge mana') || planActionLower.includes('charge:');
   
   if (isChargeAction && (currentPhase === 'CHARGE' || state.can_charge_mana)) {
+    if (planActionLower.includes('lewati')) {
+      const skipManaBtns = document.querySelectorAll('.stone-end, .stone, button');
+      for (const b of skipManaBtns) {
+        const bText = (b.textContent || '').toLowerCase();
+        if (bText.includes('skip mana')) {
+          VirtualAgent.clickTarget(b, 'SKIP MANA');
+          hasChargedThisTurn = true;
+          logAutoplay(`🎯 Lewati Mana: Klik SKIP MANA`);
+          return;
+        }
+      }
+      return;
+    }
+
     let cardName = rec.mana_charge?.card?.name || '';
     const match = planAction.match(/Charge Mana:\s*(.+)$/i) || planAction.match(/Charge:\s*(.+)$/i);
     if (match) cardName = match[1].trim();
@@ -1893,8 +1914,16 @@ function executeAutoplayStep(rec, state) {
 
   if (isPlayAction && currentPhase === 'MAIN') {
     let cardName = rec.plays?.[0]?.cards?.[0]?.name || '';
-    const playMatch = planAction.match(/Mainkan:\s*([^→+\n\r]+)/i);
-    if (playMatch) cardName = playMatch[1].trim();
+    const playMatch = planAction.match(/Mainkan:\s*([^\n\r]+)/i);
+    if (playMatch) {
+      let rawName = playMatch[1].trim();
+      const arrMatch = rawName.match(/^(.*?)\s*->/);
+      if (arrMatch) rawName = arrMatch[1].trim();
+      cardName = rawName;
+    }
+
+    const targetMatch = planAction.match(/Target:\s*([^\n\r]+)/i);
+    const targetName = targetMatch ? targetMatch[1].trim() : '';
 
     const sig = `PLAY_${cardName || 'CARD'}_T${state.turn_number}`;
     if (!trackAction(sig)) return;
@@ -1915,12 +1944,20 @@ function executeAutoplayStep(rec, state) {
                   const baitEl = findBattleCardEl(baseName, true) || document.querySelector('.side.me .zone.battle .card.choice, .side.me .zone.battle .card.selectable');
                   if (baitEl) {
                     VirtualAgent.clickTarget(baitEl, `Evolusi ${baseName || 'Bait'}`);
-                    logAutoplay(`🌟 Evolusi ${cardName} ke atas ${baseName || 'Bait'}`);
+                    logAutoplay(`🎯 Evolusi ${cardName} ke atas ${baseName || 'Bait'}`);
                   }
                 }, 350);
+              } else if (targetName) {
+                setTimeout(() => {
+                  const targetEl = findBattleCardEl(targetName, false) || findBattleCardEl(targetName, true) || document.querySelector('.zone.battle .card.choice, .zone.battle .card.selectable, .zone.battle .card.target');
+                  if (targetEl) {
+                    VirtualAgent.clickTarget(targetEl, `Target ${targetName}`);
+                    logAutoplay(`🎯 Target Efek: ${targetName}`);
+                  }
+                }, 400);
               }
             });
-            logAutoplay(`🃏 Konfirmasi Mainkan: ${modalPlayBtn.textContent.trim()}`);
+            logAutoplay(`🎯 Konfirmasi Mainkan: ${modalPlayBtn.textContent.trim()}`);
           } else {
             const battleZone = findBattleZoneEl();
             if (battleZone) {
@@ -1930,11 +1967,20 @@ function executeAutoplayStep(rec, state) {
         }, 250);
       });
 
-      logAutoplay(`🃏 Mainkan: ${cardName}`);
+      logAutoplay(`🎯 Mainkan: ${cardName}`);
       return;
     } else {
+      if (targetName) {
+        const possibleTarget = findBattleCardEl(targetName, false) || findBattleCardEl(targetName, true) || document.querySelector('.zone.battle .card.choice, .zone.battle .card.selectable, .zone.battle .card.target');
+        if (possibleTarget && (possibleTarget.classList.contains('choice') || possibleTarget.classList.contains('target') || possibleTarget.classList.contains('selectable'))) {
+          VirtualAgent.clickTarget(possibleTarget, `Recover Target ${targetName}`);
+          logAutoplay(`🎯 Pulihkan Target Efek: ${targetName}`);
+          return;
+        }
+      }
       logAutoplay(`⚠️ Kartu "${cardName}" tidak ditemukan di tangan.`);
     }
+  }
   }
 
   // Jika AI merekomendasikan transisi ke ATTACK PHASE:
