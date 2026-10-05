@@ -54,6 +54,30 @@ const cardsRetryInterval = setInterval(() => {
 // ══════════════════════════════════════════════════════════════
 // 🎯 CODEX-STYLE VIRTUAL AGENT POINTER CONTROLLER
 // ══════════════════════════════════════════════════════════════
+
+const waitForElementAndClick = (selector, label, fallbackSelector = null, actionFn = null, timeout = 3000) => {
+  const start = Date.now();
+  const check = () => {
+    let el = null;
+    if (typeof selector === 'function') el = selector();
+    else el = document.querySelector(selector);
+    
+    if (!el && fallbackSelector) {
+      el = typeof fallbackSelector === 'function' ? fallbackSelector() : document.querySelector(fallbackSelector);
+    }
+    
+    if (el) {
+      if (actionFn) actionFn(el);
+      else VirtualAgent.clickTarget(el, label);
+    } else if (Date.now() - start < timeout) {
+      requestAnimationFrame(check);
+    } else {
+      console.warn('[DMA] waitForElement timeout:', label);
+    }
+  };
+  check();
+};
+
 const VirtualAgent = {
   el: null,
   badgeEl: null,
@@ -1014,6 +1038,20 @@ function scanDOM() {
     }
   };
 
+  // 5. SMART POLLING (Hash Check)
+  const stateHash = JSON.stringify(lastGameState);
+  if (stateHash === window.__dma_lastStateHash) {
+    if (isWaitingForAnalysis) return;
+    if (isAutoplayEnabled && lastRecommendations) {
+      triggerAutoplay(lastRecommendations, lastGameState);
+    }
+    return;
+  }
+  window.__dma_lastStateHash = stateHash;
+  lastActionSignature = ''; // Reset anti-stuck sig on state change
+  consecutiveActionCount = 0;
+
+
   updateStatus(activePrompt ? `🎯 Efek Aktif!` : `🔄 Menganalisa...`);
   isWaitingForAnalysis = true;
 
@@ -1923,7 +1961,7 @@ function executeAutoplayStep(rec, state) {
     }
 
     const targetMatch = planAction.match(/Target:\s*([^\n\r]+)/i);
-    const targetName = targetMatch ? targetMatch[1].trim() : '';
+    const targetNames = targetMatches.map(m => m[1].trim());
 
     const sig = `PLAY_${cardName || 'CARD'}_T${state.turn_number}`;
     if (!trackAction(sig)) return;
@@ -1947,14 +1985,23 @@ function executeAutoplayStep(rec, state) {
                     logAutoplay(`🎯 Evolusi ${cardName} ke atas ${baseName || 'Bait'}`);
                   }
                 }, 350);
-              } else if (targetName) {
-                setTimeout(() => {
-                  const targetEl = findBattleCardEl(targetName, false) || findBattleCardEl(targetName, true) || document.querySelector('.zone.battle .card.choice, .zone.battle .card.selectable, .zone.battle .card.target');
-                  if (targetEl) {
-                    VirtualAgent.clickTarget(targetEl, `Target ${targetName}`);
-                    logAutoplay(`🎯 Target Efek: ${targetName}`);
-                  }
-                }, 400);
+              } else if (targetNames.length > 0) {
+                const clickNextTarget = (idx) => {
+                  if (idx >= targetNames.length) return;
+                  const tName = targetNames[idx];
+                  waitForElementAndClick(
+                    () => findBattleCardEl(tName, false) || findBattleCardEl(tName, true) || document.querySelector('.zone.battle .card.choice, .zone.battle .card.selectable, .zone.battle .card.target'),
+                    `Target ${tName}`,
+                    null,
+                    (tEl) => {
+                      VirtualAgent.clickTarget(tEl, `Target ${tName}`, () => {
+                        logAutoplay(`🎯 Target Efek: ${tName}`);
+                        setTimeout(() => clickNextTarget(idx + 1), 250);
+                      });
+                    }
+                  );
+                };
+                clickNextTarget(0);
               }
             });
             logAutoplay(`🎯 Konfirmasi Mainkan: ${modalPlayBtn.textContent.trim()}`);
@@ -1970,11 +2017,13 @@ function executeAutoplayStep(rec, state) {
       logAutoplay(`🎯 Mainkan: ${cardName}`);
       return;
     } else {
-      if (targetName) {
-        const possibleTarget = findBattleCardEl(targetName, false) || findBattleCardEl(targetName, true) || document.querySelector('.zone.battle .card.choice, .zone.battle .card.selectable, .zone.battle .card.target');
+      if (targetNames.length > 0) {
+        // Just click the first available target to recover
+        const tName = targetNames[0];
+        const possibleTarget = findBattleCardEl(tName, false) || findBattleCardEl(tName, true) || document.querySelector('.zone.battle .card.choice, .zone.battle .card.selectable, .zone.battle .card.target');
         if (possibleTarget && (possibleTarget.classList.contains('choice') || possibleTarget.classList.contains('target') || possibleTarget.classList.contains('selectable'))) {
-          VirtualAgent.clickTarget(possibleTarget, `Recover Target ${targetName}`);
-          logAutoplay(`🎯 Pulihkan Target Efek: ${targetName}`);
+          VirtualAgent.clickTarget(possibleTarget, `Recover Target ${tName}`);
+          logAutoplay(`🎯 Pulihkan Target Efek: ${tName}`);
           return;
         }
       }
