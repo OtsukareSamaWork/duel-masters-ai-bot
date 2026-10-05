@@ -193,7 +193,21 @@ class BoardAnalyzer:
         seen_triggers = sum(1 for c in known_cards if c.card.shield_trigger)
         
         # Assumption: A standard competitive deck runs about 10 shield triggers
+        # Dynamic trigger assumption based on revealed civilizations
+        opp_civs = set()
+        for c in known_cards:
+            for civ in c.card.civilization:
+                civ_name = civ.name if hasattr(civ, 'name') else str(civ)
+                opp_civs.add(civ_name)
+        
         assumed_total_triggers = 10
+        if 'WATER' in opp_civs or 'LIGHT' in opp_civs or 'DARKNESS' in opp_civs:
+            assumed_total_triggers = 12
+        if 'WATER' in opp_civs and 'LIGHT' in opp_civs:
+            assumed_total_triggers = 16
+        if opp_civs.issubset({'FIRE', 'NATURE'}):
+            assumed_total_triggers = 8
+
         remaining_triggers_est = max(0, assumed_total_triggers - seen_triggers)
         
         unknown_cards = max(1, 40 - visible_count - opp.hand_size) 
